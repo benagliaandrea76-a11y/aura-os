@@ -2,14 +2,22 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AURA OS - Performance & Recovery Dashboard</title>
+    
+    <!-- PWA Setup per Chrome & Smartphone -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0c0f17">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- AUTH SCREEN (LOGIN / REGISTRAZIONE) -->
+    <!-- AUTH SCREEN -->
     <div id="auth-screen" class="auth-overlay">
         <div class="glass-card auth-card">
             <div class="logo-area" style="justify-content: center; margin-bottom: 25px;">
@@ -78,7 +86,7 @@
     <!-- MAIN APP CONTAINER -->
     <div id="main-app" class="app-container" style="display: none;">
         
-        <!-- Sidebar Navigation (Desktop) -->
+        <!-- Sidebar Navigation (VISIBILE SOLO SU DESKTOP/PC) -->
         <aside class="desktop-sidebar">
             <div class="logo-area">
                 <div class="logo-icon">A</div>
@@ -96,7 +104,7 @@
             </ul>
         </aside>
 
-        <!-- Header Mobile -->
+        <!-- Header Mobile (VISIBILE SOLO SU SMARTPHONE) -->
         <div class="mobile-header">
             <div class="logo-area" style="margin-bottom: 0;">
                 <div class="logo-icon">A</div>
@@ -175,12 +183,12 @@
 
             <!-- TAB 3: CALENDARIO -->
             <div class="tab-content" id="tab-2">
-                <header class="header-top" style="display: flex; justify-content: space-between; align-items: center;">
+                <header class="header-top calendar-header-responsive">
                     <div class="welcome-msg">
                         <h2>Calendario & Programmazione</h2>
                         <p id="calendar-week-range">Settimana Corrente</p>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="calendar-controls">
                         <button type="button" class="btn-neon-icon" id="prev-week-btn">◀</button>
                         <button type="button" class="btn-neon-icon" id="today-week-btn">Oggi</button>
                         <button type="button" class="btn-neon-icon" id="next-week-btn">▶</button>
@@ -188,9 +196,9 @@
                     </div>
                 </header>
 
-                <div class="glass-card" style="padding: 10px; overflow-x: auto;">
+                <div class="glass-card calendar-wrapper">
                     <div class="calendar-weekly-grid" id="weekly-grid">
-                        <!-- Generato dinamicamente via JS (Lunedì - Domenica) -->
+                        <!-- Generato dinamicamente via JS -->
                     </div>
                 </div>
             </div>
@@ -255,7 +263,7 @@
             </div>
         </main>
 
-        <!-- Bottom Navigation (Mobile) -->
+        <!-- Bottom Navigation (VISIBILE SOLO SU SMARTPHONE) -->
         <nav class="mobile-bottom-nav">
             <div class="mobile-nav-item active" data-tab="0">
                 <div class="icon">🏠</div>
@@ -334,6 +342,12 @@
         </div>
     </div>
 
+    <!-- Script per registrare il Service Worker per PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+      }
+    </script>
     <script type="module" src="app.js"></script>
 </body>
 </html>
