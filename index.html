@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AURA OS - Performance & Recovery Dashboard</title>
+    <title>AURA OS - Athletic Performance Dashboard</title>
     
-    <!-- PWA Setup per Chrome & Smartphone -->
+    <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0c0f17">
+    <meta name="theme-color" content="#08080a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -21,10 +20,10 @@
     <div id="auth-screen" class="auth-overlay">
         <div class="glass-card auth-card">
             <div class="logo-area" style="justify-content: center; margin-bottom: 25px;">
-                <div class="logo-icon">A</div>
+                <div class="logo-icon">⚡</div>
                 <div class="logo-text">
                     <h1>AURA OS</h1>
-                    <span>Performance Lab</span>
+                    <span>Athletic Performance</span>
                 </div>
             </div>
             
@@ -86,13 +85,13 @@
     <!-- MAIN APP CONTAINER -->
     <div id="main-app" class="app-container" style="display: none;">
         
-        <!-- Sidebar Navigation (VISIBILE SOLO SU DESKTOP/PC) -->
+        <!-- Sidebar Navigation (PC) -->
         <aside class="desktop-sidebar">
             <div class="logo-area">
-                <div class="logo-icon">A</div>
+                <div class="logo-icon">⚡</div>
                 <div class="logo-text">
                     <h1>AURA OS</h1>
-                    <span>Performance Lab</span>
+                    <span>Athletic Lab</span>
                 </div>
             </div>
             <ul class="nav-links">
@@ -104,10 +103,10 @@
             </ul>
         </aside>
 
-        <!-- Header Mobile (VISIBILE SOLO SU SMARTPHONE) -->
+        <!-- Header Mobile -->
         <div class="mobile-header">
             <div class="logo-area" style="margin-bottom: 0;">
-                <div class="logo-icon">A</div>
+                <div class="logo-icon">⚡</div>
                 <div class="logo-text">
                     <h1>AURA OS</h1>
                 </div>
@@ -122,7 +121,7 @@
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>Bentornato, Atleta</h2>
-                        <p>Panoramica dello stato di forma e recupero odierno.</p>
+                        <p>Stato di forma e recupero agonistico.</p>
                     </div>
                     <div class="user-badge">
                         <div class="status-dot"></div>
@@ -134,22 +133,22 @@
                     <div class="glass-card">
                         <div class="card-title">Readiness Score ⚡</div>
                         <div class="card-value" id="home-readiness">-- %</div>
-                        <div class="card-desc">Salsa neurale basata sugli allenamenti.</div>
+                        <div class="card-desc">Carica uno screenshot per il calcolo neurale.</div>
                     </div>
                     <div class="glass-card">
                         <div class="card-title">Battito a Riposo 🫀</div>
                         <div class="card-value" id="home-hr">-- BPM</div>
-                        <div class="card-desc">Aggiornato da Vision Hub / Manuale.</div>
+                        <div class="card-desc">Dato sincronizzato da Vision Hub.</div>
                     </div>
                     <div class="glass-card">
-                        <div class="card-title">Ultima Attività 🔋</div>
-                        <div class="card-value highlight-green" id="home-last-activity">Nessuna</div>
-                        <div class="card-desc" id="home-last-date">Aggiungi eventi al calendario.</div>
+                        <div class="card-title">Ultimo Allenamento 🔋</div>
+                        <div class="card-value" id="home-last-activity" style="font-size: 1.4rem;">Nessuna</div>
+                        <div class="card-desc" id="home-last-date">Aggiungi sessioni al calendario.</div>
                     </div>
                     <div class="glass-card col-span-2">
                         <div class="card-title">Consiglio dell'AI Coach</div>
                         <p class="ai-recommendation-text" id="home-ai-text">
-                            "Inizia ad aggiungere i tuoi impegni nel Calendario o carica uno screenshot in Vision Hub per ricevere analisi fisiologiche dettagliate."
+                            "Inizia ad aggiungere i tuoi allenamenti nel Calendario o seleziona uno screenshot da Vision Hub per ricevere l'analisi delle tue prestazioni."
                         </p>
                     </div>
                 </div>
@@ -160,22 +159,22 @@
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>AURA AI Head Coach</h2>
-                        <p>Assistente intelligente basato sul tuo profilo e sui tuoi allenamenti reali.</p>
+                        <p>Fisiologia e consigli atletici in tempo reale.</p>
                     </div>
                 </header>
                 <div class="chat-container glass-card">
                     <div class="chat-messages" id="chat-box">
-                        <div class="message ai">Ciao! Sono il tuo assistente di fisiologia e allenamento. Leggerò i tuoi dati e il tuo calendario per aiutarti a ottimizzare la performance. Come posso aiutarti oggi?</div>
+                        <div class="message ai">Ciao! Sono il tuo assistente fisiologico. Come posso aiutarti con il tuo programma oggi?</div>
                     </div>
 
                     <div class="ai-suggestions">
                         <button type="button" class="suggestion-chip" onclick="sendSuggestion('Analizza il mio carico di allenamento.')">⚡ Analizza carico</button>
-                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Ho i muscoli affaticati, cosa faccio?')">🔋 Recupero gambe</button>
-                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Consigli nutrizionali per oggi.')">🥗 Nutrizione</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Consigli per il recupero delle gambe?')">🔋 Recupero gambe</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Consigli sulla nutrizione sportiva.')">🥗 Nutrizione</button>
                     </div>
 
                     <div class="chat-input-area">
-                        <input type="text" id="user-input" placeholder="Scrivi una domanda all'IA...">
+                        <input type="text" id="user-input" class="form-control" placeholder="Fai una domanda all'AI Coach...">
                         <button type="button" class="btn-neon" id="send-btn">Invia</button>
                     </div>
                 </div>
@@ -183,7 +182,7 @@
 
             <!-- TAB 3: CALENDARIO -->
             <div class="tab-content" id="tab-2">
-                <header class="header-top calendar-header-responsive">
+                <header class="header-top" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="welcome-msg">
                         <h2>Calendario & Programmazione</h2>
                         <p id="calendar-week-range">Settimana Corrente</p>
@@ -198,7 +197,7 @@
 
                 <div class="glass-card calendar-wrapper">
                     <div class="calendar-weekly-grid" id="weekly-grid">
-                        <!-- Generato dinamicamente via JS -->
+                        <!-- Griglia generata via JS -->
                     </div>
                 </div>
             </div>
@@ -208,18 +207,18 @@
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>Vision Hub (Garmin / Zepp / Apple Health)</h2>
-                        <p>Carica uno screenshot per l'estrazione automatica dei dati tramite IA.</p>
+                        <p>Carica gli screenshot dell'orologio per l'analisi immediata.</p>
                     </div>
                 </header>
                 <div class="glass-card upload-zone" id="drop-zone">
-                    <div class="upload-icon">📁</div>
-                    <h3>Carica lo screenshot dell'allenamento</h3>
-                    <p class="section-sub">L'IA elaborerà l'immagine estraendo FC, durata e calorie salvandole nel calendario.</p>
+                    <div class="upload-icon">📷</div>
+                    <h3>Carica lo screenshot</h3>
+                    <p class="section-sub" style="color: var(--text-muted); margin-bottom: 15px;">Estrazione automatica dei dati cardiaci e delle calorie.</p>
                     <input type="file" id="file-input" hidden accept="image/*">
                     <button type="button" class="btn-neon" onclick="document.getElementById('file-input').click()">Seleziona Foto</button>
                 </div>
                 <div id="ocr-status" style="margin-top: 15px; display: none;" class="glass-card">
-                    <p id="ocr-status-text">Analisi IA in corso...</p>
+                    <p id="ocr-status-text">Analisi in corso...</p>
                 </div>
             </div>
 
@@ -227,8 +226,8 @@
             <div class="tab-content" id="tab-4">
                 <header class="header-top">
                     <div class="welcome-msg">
-                        <h2>Profilo & Impostazioni</h2>
-                        <p>Configurazione dei tuoi parametri personali sul cloud.</p>
+                        <h2>Profilo Atleta</h2>
+                        <p>Parametri biometrici sincronizzati su Firebase.</p>
                     </div>
                 </header>
                 <div class="glass-card profile-card">
@@ -263,7 +262,7 @@
             </div>
         </main>
 
-        <!-- Bottom Navigation (VISIBILE SOLO SU SMARTPHONE) -->
+        <!-- Bottom Navigation Mobile -->
         <nav class="mobile-bottom-nav">
             <div class="mobile-nav-item active" data-tab="0">
                 <div class="icon">🏠</div>
@@ -289,25 +288,25 @@
 
     </div>
 
-    <!-- MODALE AGGIUNGI EVENTO "+" -->
+    <!-- MODALE CREAZIONE EVENTO "+" -->
     <div id="event-modal" class="auth-overlay" style="display: none; z-index: 9999;">
-        <div class="glass-card auth-card" style="max-width: 500px; width: 90%;">
+        <div class="glass-card auth-card" style="max-width: 480px; width: 90%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: #fff;">Nuova Attività / Evento</h3>
+                <h3 style="margin: 0; color: var(--neon-yellow); text-transform: uppercase;">Nuovo Allenamento</h3>
                 <button type="button" id="close-modal-btn" style="background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
             </div>
 
             <div class="form-group">
-                <label>Tipo</label>
+                <label>Tipo Inserimento</label>
                 <select id="modal-event-type" class="form-control">
-                    <option value="calendar">Allenamento in Calendario</option>
+                    <option value="calendar">Sessione in Calendario</option>
                     <option value="task">Promemoria / Task</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Titolo (es. Palestra Pettorali, Bici XCO)</label>
-                <input type="text" id="modal-event-title" class="form-control" placeholder="Nome dell'attività...">
+                <label>Titolo (es. Palestra Petto/Braccia, Bici XCO)</label>
+                <input type="text" id="modal-event-title" class="form-control" placeholder="Nome dell'allenamento...">
             </div>
 
             <div class="form-row">
@@ -316,11 +315,11 @@
                     <input type="date" id="modal-event-date" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label>Inizio</label>
+                    <label>Ora Inizio</label>
                     <input type="time" id="modal-event-start" class="form-control" value="15:00">
                 </div>
                 <div class="form-group">
-                    <label>Fine</label>
+                    <label>Ora Fine</label>
                     <input type="time" id="modal-event-end" class="form-control" value="16:30">
                 </div>
             </div>
@@ -334,15 +333,14 @@
             </div>
 
             <div class="form-group">
-                <label>Scheda / Esercizi Specifici / Note</label>
-                <textarea id="modal-event-details" class="form-control" rows="3" placeholder="Es. Panca piana 4x8, Curl 3x10..."></textarea>
+                <label>Scheda Esercizi / Note</label>
+                <textarea id="modal-event-details" class="form-control" rows="3" placeholder="Es. Panca piana 4x8, Squat 4x6, Stretching 15 min..."></textarea>
             </div>
 
-            <button type="button" class="btn-neon" id="save-modal-event-btn" style="width: 100%; margin-top: 10px;">Salva nel Calendario</button>
+            <button type="button" class="btn-neon" id="save-modal-event-btn" style="width: 100%; margin-top: 10px;">Salva in Calendario</button>
         </div>
     </div>
 
-    <!-- Script per registrare il Service Worker per PWA -->
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
