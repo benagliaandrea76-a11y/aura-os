@@ -13,27 +13,32 @@
     margin: 0;
     padding: 0;
     font-family: 'Outfit', sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
     background-color: var(--bg-color);
     color: var(--text-main);
-    min-height: 100vh;
-    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden; /* Blocca definitivamente lo sfarfallio e lo scroll orizzontale */
 }
 
+/* OVERLAY MODALI & LOGIN */
 .auth-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(12, 15, 23, 0.85);
+    background: rgba(12, 15, 23, 0.92);
     backdrop-filter: blur(12px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 15px;
+    overflow-y: auto;
 }
 
 .glass-card {
@@ -41,13 +46,16 @@ body {
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(16px);
     border-radius: 20px;
-    padding: 24px;
+    padding: 20px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    width: 100%;
+    max-width: 100%;
 }
 
 .auth-card {
-    width: 100%;
     max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .logo-area {
@@ -57,17 +65,18 @@ body {
 }
 
 .logo-icon {
-    width: 45px;
-    height: 45px;
+    width: 42px;
+    height: 42px;
     background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     color: #000;
     box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    flex-shrink: 0;
 }
 
 .logo-text h1 {
@@ -83,7 +92,7 @@ body {
 
 .auth-tabs {
     display: flex;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     border-radius: 12px;
     padding: 4px;
     margin-bottom: 20px;
@@ -107,7 +116,7 @@ body {
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .form-group label {
@@ -135,7 +144,7 @@ body {
 
 .form-row {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .btn-neon {
@@ -150,16 +159,14 @@ body {
     box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
 }
 
-.btn-neon:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
-}
-
 .app-container {
     display: flex;
     min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
 }
 
+/* SIDEBAR DESKTOP */
 .desktop-sidebar {
     width: 260px;
     background: rgba(12, 15, 23, 0.95);
@@ -168,6 +175,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 30px;
+    flex-shrink: 0;
 }
 
 .nav-links {
@@ -191,13 +199,18 @@ body {
     color: var(--neon-cyan);
 }
 
+/* HEADER MOBILE */
 .mobile-header {
     display: none;
-    padding: 15px 20px;
+    padding: 12px 16px;
     background: rgba(12, 15, 23, 0.95);
     border-bottom: 1px solid var(--glass-border);
     align-items: center;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
 }
 
 .status-dot {
@@ -210,13 +223,15 @@ body {
 
 main {
     flex: 1;
-    padding: 30px;
+    padding: 16px;
     overflow-y: auto;
-    max-width: 1200px;
+    max-width: 100%;
+    width: 100%;
 }
 
 .tab-content {
     display: none;
+    width: 100%;
 }
 
 .tab-content.active {
@@ -227,55 +242,58 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    gap: 10px;
 }
 
 .welcome-msg h2 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     margin-bottom: 4px;
 }
 
 .welcome-msg p {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .user-badge {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    padding: 8px 14px;
+    padding: 6px 12px;
     border-radius: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .grid-dashboard {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
 }
 
 .col-span-2 {
-    grid-column: span 2;
+    grid-column: span 1;
 }
 
 .card-title {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .card-value {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .card-desc {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
 }
 
@@ -286,14 +304,17 @@ main {
 .ai-recommendation-text {
     font-style: italic;
     color: rgba(255,255,255,0.9);
-    line-height: 1.5;
+    line-height: 1.4;
+    font-size: 0.88rem;
 }
 
-/* Chat IA */
+/* CHAT AI COACH */
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 550px;
+    height: calc(100vh - 240px);
+    min-height: 380px;
+    width: 100%;
 }
 
 .chat-messages {
@@ -301,16 +322,16 @@ main {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding-right: 8px;
-    margin-bottom: 15px;
+    gap: 10px;
+    padding-right: 4px;
+    margin-bottom: 12px;
 }
 
 .message {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 14px;
-    max-width: 80%;
-    font-size: 0.9rem;
+    max-width: 85%;
+    font-size: 0.85rem;
     line-height: 1.4;
 }
 
@@ -331,9 +352,11 @@ main {
 
 .ai-suggestions {
     display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    width: 100%;
 }
 
 .suggestion-chip {
@@ -342,63 +365,64 @@ main {
     color: var(--neon-cyan);
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     cursor: pointer;
-    transition: background 0.2s;
-}
-
-.suggestion-chip:hover {
-    background: rgba(0, 242, 254, 0.2);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .chat-input-area {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    width: 100%;
 }
 
 .chat-input-area input {
     flex: 1;
+    min-width: 0;
 }
 
-/* Calendario Stile Reale */
+/* CALENDARIO REATTIVO */
 .btn-add-main {
     background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
     border: none;
     color: #000;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    flex-shrink: 0;
 }
 
 .btn-neon-icon {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--glass-border);
     color: #fff;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 0.85rem;
 }
 
 .calendar-weekly-grid {
     display: grid;
-    grid-template-columns: repeat(7, minmax(140px, 1fr));
-    gap: 10px;
-    min-width: 950px;
+    grid-template-columns: repeat(7, minmax(120px, 1fr));
+    gap: 8px;
+    min-width: 840px;
 }
 
 .day-column {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
-    padding: 10px;
-    min-height: 480px;
+    padding: 8px;
+    min-height: 360px;
     display: flex;
     flex-direction: column;
 }
@@ -410,19 +434,19 @@ main {
 
 .day-header {
     text-align: center;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--glass-border);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .day-header .day-name {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--text-muted);
 }
 
 .day-header .day-number {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #fff;
 }
@@ -431,9 +455,9 @@ main {
     background: rgba(0, 242, 254, 0.12);
     border-left: 3px solid var(--neon-cyan);
     border-radius: 6px;
-    padding: 8px;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
     position: relative;
 }
 
@@ -445,7 +469,7 @@ main {
 .event-block .event-time {
     font-weight: bold;
     color: var(--neon-cyan);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
 }
 
 .event-block.task .event-time {
@@ -460,51 +484,47 @@ main {
 
 .event-block .event-desc {
     color: var(--text-muted);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     white-space: pre-line;
 }
 
 .event-block .delete-event-btn {
     position: absolute;
-    top: 4px;
+    top: 2px;
     right: 4px;
     background: none;
     border: none;
     color: #ff4757;
     cursor: pointer;
     font-size: 0.8rem;
-    display: none;
 }
 
-.event-block:hover .delete-event-btn {
-    display: block;
-}
-
-/* Vision Hub Upload */
+/* VISION HUB UPLOAD */
 .upload-zone {
     text-align: center;
-    padding: 40px;
+    padding: 25px 12px;
     border: 2px dashed rgba(255, 255, 255, 0.15);
     border-radius: 16px;
     cursor: pointer;
+    width: 100%;
 }
 
 .upload-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 8px;
 }
 
-/* Mobile Bottom Navigation */
+/* BARRA NAVIGAZIONE MOBILE BOTTOM */
 .mobile-bottom-nav {
     display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(12, 15, 23, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(12, 15, 23, 0.96);
+    backdrop-filter: blur(16px);
     border-top: 1px solid var(--glass-border);
-    padding: 10px 0;
+    padding: 8px 0;
     justify-content: space-around;
     z-index: 999;
 }
@@ -513,9 +533,9 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     cursor: pointer;
 }
 
@@ -524,9 +544,10 @@ main {
 }
 
 .mobile-nav-item .icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
+/* MEDIA QUERIES PER DISPOSITIVI MOBILI */
 @media (max-width: 768px) {
     .desktop-sidebar {
         display: none;
@@ -538,7 +559,18 @@ main {
         display: flex;
     }
     main {
-        padding: 15px;
+        padding: 12px;
         padding-bottom: 80px;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .chat-container {
+        height: calc(100vh - 250px);
     }
 }
