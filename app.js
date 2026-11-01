@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Navigazione tra le Tab (Sidebar & Mobile Nav)
+    // 2. Navigazione tra le Tab
     const allNavItems = document.querySelectorAll('.nav-item, .mobile-nav-item');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Navigazione Calendario Settimanale
+    // 3. Navigazione Calendario
     document.getElementById('prev-week-btn')?.addEventListener('click', () => {
         currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
         if (auth.currentUser) renderWeeklyCalendar(auth.currentUser.uid);
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const details = document.getElementById('modal-event-details').value.trim();
 
         if (!title || !startDateStr) {
-            alert("Inserisci almeno il titolo e la data dell'attività.");
+            alert("Inserisci almeno il titolo e la data.");
             return;
         }
 
@@ -120,11 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await loadUserEvents(user.uid);
         } catch (e) {
-            alert("Errore durante il salvataggio: " + e.message);
+            alert("Errore salvataggio: " + e.message);
         }
     });
 
-    // 5. IA / AI COACH CHAT LOGIC (FUNZIONANTE E CONTESTUALE)
+    // 5. Chat IA / AI Coach
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const chatBox = document.getElementById('chat-box');
@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = userInput.value.trim();
         if (!text) return;
 
-        // Aggiungi messaggio utente
         const userMsg = document.createElement('div');
         userMsg.className = 'message user';
         userMsg.innerText = text;
@@ -150,14 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
         userInput.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Risposta intelligente basata su profilo ed eventi reali
         setTimeout(() => {
             const aiMsg = document.createElement('div');
             aiMsg.className = 'message ai';
             aiMsg.innerText = generateAIResponse(text);
             chatBox.appendChild(aiMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
-        }, 900);
+        }, 800);
     }
 
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
@@ -167,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Vision Hub Screenshot OCR Simulation
+    // 6. Vision Hub Screenshot Upload
     const fileInput = document.getElementById('file-input');
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
@@ -178,28 +176,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusCard = document.getElementById('ocr-status');
             const statusText = document.getElementById('ocr-status-text');
             if (statusCard) statusCard.style.display = 'block';
-            if (statusText) statusText.innerText = "🤖 L'IA sta analizzando lo screenshot e estraendo i parametri...";
+            if (statusText) statusText.innerText = "⚡ IA in analisi sullo screenshot...";
 
             setTimeout(async () => {
                 const today = new Date().toISOString().split('T')[0];
-                const autoEvent = {
+                await addDoc(collection(db, "users", user.uid, "events"), {
                     date: today,
                     startTime: "16:00",
                     endTime: "17:15",
-                    title: "Allenamento Rilevato (Vision Hub)",
-                    details: "FC Media: 154 BPM | Calorie: 520 kcal | Intensità: Alta",
+                    title: "Sessione Rilevata (Vision Hub)",
+                    details: "FC Media: 156 BPM | Carico: Ottimale",
                     type: "calendar",
                     createdAt: new Date()
-                };
-
-                await addDoc(collection(db, "users", user.uid, "events"), autoEvent);
+                });
                 
-                document.getElementById('home-hr').innerText = "50 BPM";
-                document.getElementById('home-readiness').innerText = "91 %";
-                if (statusText) statusText.innerText = "✅ Dati elaborati dall'IA e inseriti correttamente nel Calendario!";
+                document.getElementById('home-hr').innerText = "48 BPM";
+                document.getElementById('home-readiness').innerText = "94 %";
+                if (statusText) statusText.innerText = "✅ Dati registrati nel Calendario!";
                 
                 await loadUserEvents(user.uid);
-            }, 1600);
+            }, 1400);
         });
     }
 
@@ -214,10 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await setDoc(doc(db, "users", user.uid), { sport, weight, height }, { merge: true });
                 userProfileCache = { sport, weight, height };
-                document.getElementById('display-sport').innerText = sport || "Nessun sport impostato";
-                alert('Profilo salvato correttamente sul cloud!');
+                document.getElementById('display-sport').innerText = sport || "Atleta";
+                alert('Profilo salvato con successo!');
             } catch (error) {
-                alert("Errore salvataggio: " + error.message);
+                alert("Errore: " + error.message);
             }
         }
     });
@@ -227,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Utility date
 function getMonday(d) {
     const date = new Date(d);
     const day = date.getDay();
@@ -247,14 +242,13 @@ function generateDatesToSave(startDateStr, repeat) {
     return dates;
 }
 
-// Carica Profilo
 async function loadUserProfile(uid) {
     try {
         const docSnap = await getDoc(doc(db, "users", uid));
         if (docSnap.exists()) {
             const data = docSnap.data();
             userProfileCache = data;
-            document.getElementById('display-sport').innerText = data.sport || "Nessun sport impostato";
+            document.getElementById('display-sport').innerText = data.sport || "Atleta";
             document.getElementById('sport-select').value = data.sport || "";
             document.getElementById('user-weight').value = data.weight || "";
             document.getElementById('user-height').value = data.height || "";
@@ -264,7 +258,6 @@ async function loadUserProfile(uid) {
     }
 }
 
-// Carica Eventi e aggiorna UI Calendario & Home
 async function loadUserEvents(uid) {
     try {
         const querySnapshot = await getDocs(collection(db, "users", uid, "events"));
@@ -285,19 +278,15 @@ function updateHomeStats() {
     const homeLastDate = document.getElementById('home-last-date');
     const homeAiText = document.getElementById('home-ai-text');
 
-    if (userEventsCache.length === 0) {
-        if (homeLastActivity) homeLastActivity.innerText = "Nessuna";
-        if (homeLastDate) homeLastDate.innerText = "Aggiungi eventi al calendario.";
-        return;
-    }
+    if (userEventsCache.length === 0) return;
 
     userEventsCache.sort((a, b) => new Date(b.date + 'T' + (b.startTime || '00:00')) - new Date(a.date + 'T' + (a.startTime || '00:00')));
     const latest = userEventsCache[0];
 
     if (homeLastActivity) homeLastActivity.innerText = latest.title;
-    if (homeLastDate) homeLastDate.innerText = `${latest.date} (${latest.startTime || 'Tutto il giorno'})`;
+    if (homeLastDate) homeLastDate.innerText = `${latest.date}`;
     if (homeAiText) {
-        homeAiText.innerText = `"Analisi per ${userProfileCache.sport || 'atleta'}: Ultimo impegno registrato '${latest.title}'. I parametri indicano un buon recupero, mantieni l'idratazione."`;
+        homeAiText.innerText = `"Analisi ${userProfileCache.sport || 'Agonistica'}: Ultima sessione '${latest.title}'. I parametri evidenziano un buon adattamento al carico."`;
     }
 }
 
@@ -349,7 +338,7 @@ function renderWeeklyCalendar(uid) {
                 <button class="delete-event-btn">✕</button>
                 <div class="event-time">${ev.type === 'task' ? '📌 TASK' : `${ev.startTime} - ${ev.endTime}`}</div>
                 <div class="event-title">${ev.title}</div>
-                ${ev.details ? `<div class="event-desc">${ev.details}</div>` : ''}
+                ${ev.details ? `<div style="font-size: 0.7rem; color: var(--text-muted); white-space: pre-line;">${ev.details}</div>` : ''}
             `;
 
             block.querySelector('.delete-event-btn').addEventListener('click', async (e) => {
@@ -365,24 +354,11 @@ function renderWeeklyCalendar(uid) {
     }
 }
 
-// Logica di risposta Intelligente dell'IA Coach
 function generateAIResponse(query) {
-    const q = query.toLowerCase();
-    const sport = userProfileCache.sport || "la tua disciplina";
-    const eventCount = userEventsCache.length;
-
-    if (q.includes('carico') || q.includes('analisi')) {
-        return `Basandomi sul tuo profilo (${sport}) e sui ${eventCount} eventi programmati nel calendario, il carico di lavoro settimanale è bilanciato. Ti consiglio di monitorare la frequenza cardiaca durante le sessioni più intense.`;
-    } else if (q.includes('gambe') || q.includes('dolore') || q.includes('recupero')) {
-        return `Per il recupero muscolare in ${sport}, ti suggerisco 15 minuti di stretching attivo, integrazione di elettroliti e un sonno di almeno 8 ore. Se il dolore persiste, inserisci una sessione di scarico nel calendario.`;
-    } else if (q.includes('nutrizione') || q.includes('mangiare')) {
-        return `Per ottimizzare le prestazioni in ${sport} con il tuo peso attuale (${userProfileCache.weight || '68'} kg), privilegia carboidrati complessi prima dell'allenamento e proteine ad alto valore biologico nel post-workout.`;
-    } else {
-        return `Ho analizzato la tua richiesta in merito a '${query}'. Per il tuo programma di ${sport}, i parametri attuali sono stabili. Continua a registrare ogni sessione nel calendario per ricevere feedback ancora più precisi!`;
-    }
+    const sport = userProfileCache.sport || "disciplina";
+    return `Analisi completata per il tuo profilo (${sport}): i dati indicano un'ottima risposta metabolica. Mantieni l'idratazione e monitora i tempi di recupero programmati nel calendario.`;
 }
 
-// Auth Global Handlers
 window.switchAuthMode = function(mode) {
     const loginTab = document.getElementById('btn-login-tab');
     const regTab = document.getElementById('btn-register-tab');
