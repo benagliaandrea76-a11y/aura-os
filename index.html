@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AURA OS - Performance & Recovery Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- AUTH SCREEN (LOGIN / REGISTRAZIONE) -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="glass-card auth-card">
+            <div class="logo-area" style="justify-content: center; margin-bottom: 25px;">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">
+                    <h1>AURA OS</h1>
+                    <span>Performance Lab</span>
+                </div>
+            </div>
+            
+            <div id="auth-forms">
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="btn-login-tab" onclick="switchAuthMode('login')">Accedi</button>
+                    <button class="auth-tab-btn" id="btn-register-tab" onclick="switchAuthMode('register')">Registrati</button>
+                </div>
+
+                <div id="form-login" class="auth-form-panel active">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="iltuoindirizzo@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••">
+                    </div>
+                    <button class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Accedi al Sistema</button>
+                </div>
+
+                <div id="form-register" class="auth-form-panel" style="display: none;">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="reg-email" class="form-control" placeholder="iltuoindirizzo@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" class="form-control" placeholder="Crea una password">
+                    </div>
+                    <div class="form-group">
+                        <label>Sport Principale</label>
+                        <select class="form-control" id="reg-sport">
+                            <option value="BMX Race / Ciclismo XCO">BMX Race / Ciclismo XCO</option>
+                            <option value="Calcio">Calcio</option>
+                            <option value="Palestra / Bodybuilding">Palestra / Bodybuilding</option>
+                            <option value="Corsa / Running">Corsa / Running</option>
+                            <option value="Nuoto">Nuoto</option>
+                            <option value="Basket">Basket</option>
+                            <option value="Altro Sport Agonistico">Altro Sport Agonistico</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="reg-weight" class="form-control" value="68">
+                        </div>
+                        <div class="form-group">
+                            <label>Altezza (cm)</label>
+                            <input type="number" id="reg-height" class="form-control" value="178">
+                        </div>
+                    </div>
+                    <button class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleRegister()">Crea Account Personale</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="main-app" class="app-container" style="display: none;">
+        
+        <!-- Sidebar Navigation (Visibile su PC) -->
+        <aside class="desktop-sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">
+                    <h1>AURA OS</h1>
+                    <span>Performance Lab</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-tab="0">🏠 Home & Readiness</li>
+                <li class="nav-item" data-tab="1">🤖 AI Coach Lab</li>
+                <li class="nav-item" data-tab="2">📅 Calendario & Schede</li>
+                <li class="nav-item" data-tab="3">📷 Vision Hub</li>
+                <li class="nav-item" data-tab="4">⚙️ Impostazioni</li>
+            </ul>
+        </aside>
+
+        <!-- Header Mobile (Visibile solo su Smartphone) -->
+        <div class="mobile-header">
+            <div class="logo-area" style="margin-bottom: 0;">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">
+                    <h1>AURA OS</h1>
+                </div>
+            </div>
+            <div class="status-dot"></div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main>
+            <!-- TAB 1: HOME -->
+            <div class="tab-content active" id="tab-0">
+                <header class="header-top">
+                    <div class="welcome-msg">
+                        <h2>Bentornato, Atleta</h2>
+                        <p>Panoramica dello stato di forma e recupero odierno.</p>
+                    </div>
+                    <div class="user-badge">
+                        <div class="status-dot"></div>
+                        <span id="display-sport">BMX Race / Ciclismo XCO</span>
+                    </div>
+                </header>
+
+                <div class="grid-dashboard">
+                    <div class="glass-card">
+                        <div class="card-title">Readiness Score ⚡</div>
+                        <div class="card-value">92%</div>
+                        <div class="card-desc">Sistema nervoso centrale pronto alla spinta.</div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="card-title">Battito a Riposo 🫀</div>
+                        <div class="card-value">48 BPM</div>
+                        <div class="card-desc">Ottimale rispetto alla tua media.</div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="card-title">Recupero Muscolare 🔋</div>
+                        <div class="card-value highlight-green">85%</div>
+                        <div class="card-desc">Leggero affaticamento sui quadricipiti.</div>
+                    </div>
+                    <div class="glass-card col-span-2">
+                        <div class="card-title">Consiglio dell'AI Coach</div>
+                        <p class="ai-recommendation-text">
+                            "Ottimi parametri cardiaci oggi. Visto l'allenamento di ieri, consiglia una sessione di scarico attivo."
+                        </p>
+                    </div>
+                    <div class="glass-card">
+                        <div class="card-title">Prossimo Allenamento</div>
+                        <h3 class="workout-highlight">Palestra (Petto & Braccia)</h3>
+                        <div class="card-desc">Programmato per le ore 17:30.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AI COACH -->
+            <div class="tab-content" id="tab-1">
+                <header class="header-top">
+                    <div class="welcome-msg">
+                        <h2>AURA AI Head Coach</h2>
+                        <p>Fisiologia e consigli di allenamento personalizzati.</p>
+                    </div>
+                </header>
+                <div class="chat-container glass-card">
+                    <div class="chat-messages" id="chat-box">
+                        <div class="message ai">Ciao! Sono il tuo assistente di fisiologia. Come posso aiutarti oggi con l'allenamento o il recupero?</div>
+                    </div>
+
+                    <div class="ai-suggestions">
+                        <button class="suggestion-chip" onclick="sendSuggestion('Come sta andando la mia salute oggi?')">⚡ Come sto oggi?</button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Ho dolore alle gambe, cosa faccio?')">🔋 Recupero gambe</button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Analizza il mio carico di allenamento settimanale')">📊 Carico settimanale</button>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="user-input" placeholder="Scrivi una domanda...">
+                        <button class="btn-neon" id="send-btn">Invia</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: CALENDARIO -->
+            <div class="tab-content" id="tab-2">
+                <header class="header-top">
+                    <div class="welcome-msg">
+                        <h2>Periodizzazione & Schede</h2>
+                        <p>Gestisci i tuoi impegni settimanali flessibili.</p>
+                    </div>
+                </header>
+                <div class="glass-card">
+                    <h3 class="section-heading">Settimana Corrente</h3>
+                    <p class="section-sub">Schede e sessioni modificabili giorno per giorno.</p>
+                    <div class="calendar-grid">
+                        <div class="calendar-day"><b>Lun</b><br><br>Palestra<br><span class="accent-cyan">Petto/Braccia</span></div>
+                        <div class="calendar-day"><b>Mar</b><br><br>Pista / Bici<br><span class="accent-cyan">Tecnica</span></div>
+                        <div class="calendar-day"><b>Mer</b><br><br>Riposo<br><span class="text-muted">Recupero</span></div>
+                        <div class="calendar-day"><b>Gio</b><br><br>Palestra<br><span class="accent-cyan">Gambe</span></div>
+                        <div class="calendar-day"><b>Ven</b><br><br>Cardio<br><span class="accent-cyan">Agonismo</span></div>
+                        <div class="calendar-day"><b>Sab</b><br><br>Gara / Test<br><span class="accent-cyan">Full Gas</span></div>
+                        <div class="calendar-day"><b>Dom</b><br><br>Scarico<br><span class="text-muted">Free</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: VISION HUB -->
+            <div class="tab-content" id="tab-3">
+                <header class="header-top">
+                    <div class="welcome-msg">
+                        <h2>Vision Hub (Garmin/Zepp)</h2>
+                        <p>Carica gli screenshot per l'analisi dei dati.</p>
+                    </div>
+                </header>
+                <div class="glass-card upload-zone" id="drop-zone">
+                    <div class="upload-icon">📁</div>
+                    <h3>Carica lo screenshot</h3>
+                    <p class="section-sub">Estrazione automatica di tempo, calorie e frequenza cardiaca.</p>
+                    <input type="file" id="file-input" hidden accept="image/*">
+                    <button class="btn-neon" onclick="document.getElementById('file-input').click()">Seleziona Foto</button>
+                </div>
+            </div>
+
+            <!-- TAB 5: PROFILO -->
+            <div class="tab-content" id="tab-4">
+                <header class="header-top">
+                    <div class="welcome-msg">
+                        <h2>Profilo & Impostazioni</h2>
+                        <p>Configurazione dei tuoi dati antropometrici.</p>
+                    </div>
+                </header>
+                <div class="glass-card profile-card">
+                    <div class="form-group">
+                        <label for="sport-select">Disciplina Sportiva</label>
+                        <select class="form-control" id="sport-select">
+                            <option value="BMX Race / Ciclismo XCO">BMX Race / Ciclismo XCO</option>
+                            <option value="Calcio">Calcio</option>
+                            <option value="Palestra / Bodybuilding">Palestra / Bodybuilding</option>
+                            <option value="Corsa / Running">Corsa / Running</option>
+                            <option value="Nuoto">Nuoto</option>
+                            <option value="Basket">Basket</option>
+                            <option value="Altro Sport Agonistico">Altro Sport Agonistico</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-weight">Peso (kg)</label>
+                            <input type="number" class="form-control" id="user-weight" value="68">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-height">Altezza (cm)</label>
+                            <input type="number" class="form-control" id="user-height" value="178">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn-neon" id="save-settings-btn" style="flex: 2;">Salva Modifiche</button>
+                        <button class="btn-neon" id="logout-btn" style="flex: 1; background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.4);">Esci</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation Bar (Visibile solo su Smartphone) -->
+        <nav class="mobile-bottom-nav">
+            <div class="mobile-nav-item active" data-tab="0">
+                <div class="icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="1">
+                <div class="icon">🤖</div>
+                <span>AI Coach</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="2">
+                <div class="icon">📅</div>
+                <span>Agenda</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="3">
+                <div class="icon">📷</div>
+                <span>Vision</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="4">
+                <div class="icon">⚙️</div>
+                <span>Profilo</span>
+            </div>
+        </nav>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
