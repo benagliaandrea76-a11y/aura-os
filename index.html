@@ -22,8 +22,8 @@
             
             <div id="auth-forms">
                 <div class="auth-tabs">
-                    <button class="auth-tab-btn active" id="btn-login-tab" onclick="switchAuthMode('login')">Accedi</button>
-                    <button class="auth-tab-btn" id="btn-register-tab" onclick="switchAuthMode('register')">Registrati</button>
+                    <button type="button" class="auth-tab-btn active" id="btn-login-tab" onclick="switchAuthMode('login')">Accedi</button>
+                    <button type="button" class="auth-tab-btn" id="btn-register-tab" onclick="switchAuthMode('register')">Registrati</button>
                 </div>
 
                 <div id="form-login" class="auth-form-panel active">
@@ -35,7 +35,7 @@
                         <label>Password</label>
                         <input type="password" id="login-password" class="form-control" placeholder="••••••••">
                     </div>
-                    <button class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Accedi al Sistema</button>
+                    <button type="button" class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Accedi al Sistema</button>
                 </div>
 
                 <div id="form-register" class="auth-form-panel" style="display: none;">
@@ -69,7 +69,7 @@
                             <input type="number" id="reg-height" class="form-control" value="178">
                         </div>
                     </div>
-                    <button class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleRegister()">Crea Account Personale</button>
+                    <button type="button" class="btn-neon" style="width: 100%; margin-top: 10px;" onclick="handleRegister()">Crea Account Personale</button>
                 </div>
             </div>
         </div>
@@ -166,14 +166,14 @@
                     </div>
 
                     <div class="ai-suggestions">
-                        <button class="suggestion-chip" onclick="sendSuggestion('Come sta andando la mia salute oggi?')">⚡ Come sto oggi?</button>
-                        <button class="suggestion-chip" onclick="sendSuggestion('Ho dolore alle gambe, cosa faccio?')">🔋 Recupero gambe</button>
-                        <button class="suggestion-chip" onclick="sendSuggestion('Analizza il mio carico di allenamento settimanale')">📊 Carico settimanale</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Come sta andando la mia salute oggi?')">⚡ Come sto oggi?</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Ho dolore alle gambe, cosa faccio?')">🔋 Recupero gambe</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Analizza il mio carico di allenamento settimanale')">📊 Carico settimanale</button>
                     </div>
 
                     <div class="chat-input-area">
                         <input type="text" id="user-input" placeholder="Scrivi una domanda...">
-                        <button class="btn-neon" id="send-btn">Invia</button>
+                        <button type="button" class="btn-neon" id="send-btn">Invia</button>
                     </div>
                 </div>
             </div>
@@ -214,7 +214,7 @@
                     <h3>Carica lo screenshot</h3>
                     <p class="section-sub">Estrazione automatica di tempo, calorie e frequenza cardiaca.</p>
                     <input type="file" id="file-input" hidden accept="image/*">
-                    <button class="btn-neon" onclick="document.getElementById('file-input').click()">Seleziona Foto</button>
+                    <button type="button" class="btn-neon" onclick="document.getElementById('file-input').click()">Seleziona Foto</button>
                 </div>
             </div>
 
@@ -250,8 +250,8 @@
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn-neon" id="save-settings-btn" style="flex: 2;">Salva Modifiche</button>
-                        <button class="btn-neon" id="logout-btn" style="flex: 1; background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.4);">Esci</button>
+                        <button type="button" class="btn-neon" id="save-settings-btn" style="flex: 2;">Salva Modifiche</button>
+                        <button type="button" class="btn-neon" id="logout-btn" style="flex: 1; background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.4);">Esci</button>
                     </div>
                 </div>
             </div>
