@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
 const firebaseConfig = {
@@ -18,15 +18,13 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let currentWeekStartDate = getMonday(new Date());
+let userProfileCache = { sport: "Atleta", weight: "", height: "" };
+let userEventsCache = [];
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Imposta la data odierna come predefinita nel modulo del calendario
-    const todayInput = document.getElementById('event-date');
-    if (todayInput) {
-        todayInput.value = new Date().toISOString().split('T')[0];
-    }
-
-    // 1. Gestione Autenticazione Utente
+    // 1. Gestione Autenticazione & Caricamento Dati
     onAuthStateChanged(auth, async (user) => {
         const authScreen = document.getElementById('auth-screen');
         const mainApp = document.getElementById('main-app');
@@ -35,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (authScreen) authScreen.style.display = 'none';
             if (mainApp) mainApp.style.display = 'flex';
             
-            // Carica profilo personale e eventi dal cloud Firebase dell'utente
             await loadUserProfile(user.uid);
             await loadUserEvents(user.uid);
         } else {
@@ -44,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Navigazione tra le Tab
+    // 2. Navigazione tra le Tab (Sidebar & Mobile Nav)
     const allNavItems = document.querySelectorAll('.nav-item, .mobile-nav-item');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -64,46 +61,113 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Aggiunta manuale di Eventi al Calendario
-    const addEventBtn = document.getElementById('add-event-btn');
-    if (addEventBtn) {
-        addEventBtn.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (!user) return;
+    // 3. Navigazione Calendario Settimanale
+    document.getElementById('prev-week-btn')?.addEventListener('click', () => {
+        currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+        if (auth.currentUser) renderWeeklyCalendar(auth.currentUser.uid);
+    });
 
-            const date = document.getElementById('event-date').value;
-            const startTime = document.getElementById('event-start-time').value;
-            const endTime = document.getElementById('event-end-time').value;
-            const title = document.getElementById('event-title').value.trim();
-            const details = document.getElementById('event-details').value.trim();
+    document.getElementById('next-week-btn')?.addEventListener('click', () => {
+        currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+        if (auth.currentUser) renderWeeklyCalendar(auth.currentUser.uid);
+    });
 
-            if (!date || !title) {
-                alert("Per favore, inserisci almeno la data e il titolo dell'attività.");
-                return;
-            }
+    document.getElementById('today-week-btn')?.addEventListener('click', () => {
+        currentWeekStartDate = getMonday(new Date());
+        if (auth.currentUser) renderWeeklyCalendar(auth.currentUser.uid);
+    });
 
-            try {
+    // 4. Modale Eventi "+"
+    const modal = document.getElementById('event-modal');
+    document.getElementById('open-add-modal-btn')?.addEventListener('click', () => {
+        document.getElementById('modal-event-date').value = new Date().toISOString().split('T')[0];
+        if (modal) modal.style.display = 'flex';
+    });
+
+    document.getElementById('close-modal-btn')?.addEventListener('click', () => {
+        if (modal) modal.style.display = 'none';
+    });
+
+    document.getElementById('save-modal-event-btn')?.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const type = document.getElementById('modal-event-type').value;
+        const title = document.getElementById('modal-event-title').value.trim();
+        const startDateStr = document.getElementById('modal-event-date').value;
+        const startTime = document.getElementById('modal-event-start').value;
+        const endTime = document.getElementById('modal-event-end').value;
+        const repeat = document.getElementById('modal-event-repeat').value;
+        const details = document.getElementById('modal-event-details').value.trim();
+
+        if (!title || !startDateStr) {
+            alert("Inserisci almeno il titolo e la data dell'attività.");
+            return;
+        }
+
+        const datesToCreate = generateDatesToSave(startDateStr, repeat);
+
+        try {
+            for (const d of datesToCreate) {
                 await addDoc(collection(db, "users", user.uid, "events"), {
-                    date,
-                    startTime,
-                    endTime,
-                    title,
-                    details,
-                    createdAt: new Date()
+                    type, title, date: d, startTime, endTime, details, createdAt: new Date()
                 });
-
-                document.getElementById('event-title').value = '';
-                document.getElementById('event-details').value = '';
-                alert("Evento salvato con successo nel tuo calendario!");
-                
-                await loadUserEvents(user.uid);
-            } catch (e) {
-                alert("Errore durante il salvataggio dell'evento: " + e.message);
             }
+
+            if (modal) modal.style.display = 'none';
+            document.getElementById('modal-event-title').value = '';
+            document.getElementById('modal-event-details').value = '';
+
+            await loadUserEvents(user.uid);
+        } catch (e) {
+            alert("Errore durante il salvataggio: " + e.message);
+        }
+    });
+
+    // 5. IA / AI COACH CHAT LOGIC (FUNZIONANTE E CONTESTUALE)
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const chatBox = document.getElementById('chat-box');
+
+    window.sendSuggestion = function(text) {
+        if (userInput) {
+            userInput.value = text;
+            sendMessage();
+        }
+    };
+
+    function sendMessage() {
+        if (!userInput || !chatBox) return;
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        // Aggiungi messaggio utente
+        const userMsg = document.createElement('div');
+        userMsg.className = 'message user';
+        userMsg.innerText = text;
+        chatBox.appendChild(userMsg);
+
+        userInput.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Risposta intelligente basata su profilo ed eventi reali
+        setTimeout(() => {
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'message ai';
+            aiMsg.innerText = generateAIResponse(text);
+            chatBox.appendChild(aiMsg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 900);
+    }
+
+    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+    if (userInput) {
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
     }
 
-    // 4. Elaborazione Screenshot da Vision Hub (Estrazione AI Simulata)
+    // 6. Vision Hub Screenshot OCR Simulation
     const fileInput = document.getElementById('file-input');
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
@@ -114,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusCard = document.getElementById('ocr-status');
             const statusText = document.getElementById('ocr-status-text');
             if (statusCard) statusCard.style.display = 'block';
-
-            if (statusText) statusText.innerText = "🤖 L'AI sta analizzando lo screenshot del tuo dispositivo...";
+            if (statusText) statusText.innerText = "🤖 L'IA sta analizzando lo screenshot e estraendo i parametri...";
 
             setTimeout(async () => {
                 const today = new Date().toISOString().split('T')[0];
@@ -123,148 +186,203 @@ document.addEventListener('DOMContentLoaded', () => {
                     date: today,
                     startTime: "16:00",
                     endTime: "17:15",
-                    title: "Allenamento Rilevato da Screenshot",
-                    details: "FC Media: 154 BPM | Calorie: 540 kcal | Fonte: Vision Hub Analysis",
+                    title: "Allenamento Rilevato (Vision Hub)",
+                    details: "FC Media: 154 BPM | Calorie: 520 kcal | Intensità: Alta",
+                    type: "calendar",
                     createdAt: new Date()
                 };
 
                 await addDoc(collection(db, "users", user.uid, "events"), autoEvent);
                 
-                // Aggiorna anche la home
-                const hrElem = document.getElementById('home-hr');
-                if (hrElem) hrElem.innerText = "52 BPM";
-
-                const readinessElem = document.getElementById('home-readiness');
-                if (readinessElem) readinessElem.innerText = "88 %";
-
-                if (statusText) statusText.innerText = "✅ Dati estratti con successo ed inseriti nel Calendario!";
+                document.getElementById('home-hr').innerText = "50 BPM";
+                document.getElementById('home-readiness').innerText = "91 %";
+                if (statusText) statusText.innerText = "✅ Dati elaborati dall'IA e inseriti correttamente nel Calendario!";
+                
                 await loadUserEvents(user.uid);
-            }, 1500);
+            }, 1600);
         });
     }
 
-    // 5. Salvataggio Impostazioni Profilo
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user) {
-                const sport = document.getElementById('sport-select')?.value || "";
-                const weight = document.getElementById('user-weight')?.value || "";
-                const height = document.getElementById('user-height')?.value || "";
+    // 7. Salvataggio Profilo & Logout
+    document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (user) {
+            const sport = document.getElementById('sport-select')?.value || "";
+            const weight = document.getElementById('user-weight')?.value || "";
+            const height = document.getElementById('user-height')?.value || "";
 
-                try {
-                    await setDoc(doc(db, "users", user.uid), { sport, weight, height }, { merge: true });
-                    const displaySport = document.getElementById('display-sport');
-                    if (displaySport) displaySport.innerText = sport || "Nessun sport impostato";
-                    alert('Profilo salvato correttamente!');
-                } catch (error) {
-                    alert("Errore durante il salvataggio: " + error.message);
-                }
+            try {
+                await setDoc(doc(db, "users", user.uid), { sport, weight, height }, { merge: true });
+                userProfileCache = { sport, weight, height };
+                document.getElementById('display-sport').innerText = sport || "Nessun sport impostato";
+                alert('Profilo salvato correttamente sul cloud!');
+            } catch (error) {
+                alert("Errore salvataggio: " + error.message);
             }
-        });
-    }
+        }
+    });
 
-    // 6. Logout
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth);
-        });
-    }
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+        signOut(auth);
+    });
 });
 
-// Carica il profilo dell'utente da Firestore
+// Utility date
+function getMonday(d) {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(date.setDate(diff));
+}
+
+function generateDatesToSave(startDateStr, repeat) {
+    const dates = [startDateStr];
+    if (repeat === 'none') return dates;
+    const baseDate = new Date(startDateStr);
+    for (let i = 1; i <= 4; i++) {
+        const d = new Date(baseDate);
+        d.setDate(d.getDate() + (7 * i));
+        dates.push(d.toISOString().split('T')[0]);
+    }
+    return dates;
+}
+
+// Carica Profilo
 async function loadUserProfile(uid) {
     try {
-        const docRef = doc(db, "users", uid);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(doc(db, "users", uid));
         if (docSnap.exists()) {
             const data = docSnap.data();
-            const displaySport = document.getElementById('display-sport');
-            const sportSelect = document.getElementById('sport-select');
-            const userWeight = document.getElementById('user-weight');
-            const userHeight = document.getElementById('user-height');
-
-            if (displaySport) displaySport.innerText = data.sport || "Nessun sport impostato";
-            if (sportSelect) sportSelect.value = data.sport || "";
-            if (userWeight) userWeight.value = data.weight || "";
-            if (userHeight) userHeight.value = data.height || "";
+            userProfileCache = data;
+            document.getElementById('display-sport').innerText = data.sport || "Nessun sport impostato";
+            document.getElementById('sport-select').value = data.sport || "";
+            document.getElementById('user-weight').value = data.weight || "";
+            document.getElementById('user-height').value = data.height || "";
         }
     } catch (e) {
         console.error("Errore profilo:", e);
     }
 }
 
-// Carica la lista degli eventi del calendario dell'utente da Firestore
+// Carica Eventi e aggiorna UI Calendario & Home
 async function loadUserEvents(uid) {
-    const container = document.getElementById('events-list-container');
-    const noEventsMsg = document.getElementById('no-events-msg');
-    const homeLastActivity = document.getElementById('home-last-activity');
-    const homeLastDate = document.getElementById('home-last-date');
-
-    if (!container) return;
-
     try {
-        const q = query(collection(db, "users", uid, "events"));
-        const querySnapshot = await getDocs(q);
-
-        const events = [];
-        querySnapshot.forEach((doc) => {
-            events.push({ id: doc.id, ...doc.data() });
+        const querySnapshot = await getDocs(collection(db, "users", uid, "events"));
+        userEventsCache = [];
+        querySnapshot.forEach(doc => {
+            userEventsCache.push({ id: doc.id, ...doc.data() });
         });
 
-        // Ordina per data decrescente
-        events.sort((a, b) => new Date(b.date + 'T' + b.startTime) - new Date(a.date + 'T' + a.startTime));
+        renderWeeklyCalendar(uid);
+        updateHomeStats();
+    } catch (e) {
+        console.error("Errore eventi:", e);
+    }
+}
 
-        if (events.length === 0) {
-            if (noEventsMsg) noEventsMsg.style.display = 'block';
-            container.innerHTML = '<p class="text-muted">Nessun evento salvato. Compila il modulo sopra per iniziare la tua programmazione.</p>';
-            if (homeLastActivity) homeLastActivity.innerText = "Nessuna";
-            if (homeLastDate) homeLastDate.innerText = "Aggiungi eventi al calendario.";
-            return;
-        }
+function updateHomeStats() {
+    const homeLastActivity = document.getElementById('home-last-activity');
+    const homeLastDate = document.getElementById('home-last-date');
+    const homeAiText = document.getElementById('home-ai-text');
 
-        if (noEventsMsg) noEventsMsg.style.display = 'none';
-        container.innerHTML = '';
+    if (userEventsCache.length === 0) {
+        if (homeLastActivity) homeLastActivity.innerText = "Nessuna";
+        if (homeLastDate) homeLastDate.innerText = "Aggiungi eventi al calendario.";
+        return;
+    }
 
-        // Aggiorna la home con il primo evento più recente
-        if (homeLastActivity && events[0]) homeLastActivity.innerText = events[0].title;
-        if (homeLastDate && events[0]) homeLastDate.innerText = `${events[0].date} (${events[0].startTime} - ${events[0].endTime})`;
+    userEventsCache.sort((a, b) => new Date(b.date + 'T' + (b.startTime || '00:00')) - new Date(a.date + 'T' + (a.startTime || '00:00')));
+    const latest = userEventsCache[0];
 
-        events.forEach(ev => {
-            const card = document.createElement('div');
-            card.className = 'glass-card';
-            card.style.marginBottom = '10px';
-            card.style.borderLeft = '4px solid #00f2fe';
-            card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <h4 style="margin: 0; font-size: 1.1rem; color: #fff;">${ev.title}</h4>
-                        <p style="margin: 4px 0; font-size: 0.85rem; color: #00f2fe;">📅 ${ev.date} | ⏰ ${ev.startTime} - ${ev.endTime}</p>
-                        ${ev.details ? `<p style="margin: 8px 0 0 0; font-size: 0.9rem; color: rgba(255,255,255,0.8); whitespace: pre-line;">${ev.details}</p>` : ''}
-                    </div>
-                    <button class="delete-btn" style="background: transparent; border: none; color: #ff4757; cursor: pointer; font-size: 1.1rem;">🗑️</button>
-                </div>
+    if (homeLastActivity) homeLastActivity.innerText = latest.title;
+    if (homeLastDate) homeLastDate.innerText = `${latest.date} (${latest.startTime || 'Tutto il giorno'})`;
+    if (homeAiText) {
+        homeAiText.innerText = `"Analisi per ${userProfileCache.sport || 'atleta'}: Ultimo impegno registrato '${latest.title}'. I parametri indicano un buon recupero, mantieni l'idratazione."`;
+    }
+}
+
+function renderWeeklyCalendar(uid) {
+    const grid = document.getElementById('weekly-grid');
+    const rangeText = document.getElementById('calendar-week-range');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    const monday = new Date(currentWeekStartDate);
+    const sunday = new Date(monday);
+    sunday.setDate(sunday.getDate() + 6);
+
+    const options = { month: 'short', day: 'numeric' };
+    if (rangeText) {
+        rangeText.innerText = `${monday.toLocaleDateString('it-IT', options)} - ${sunday.toLocaleDateString('it-IT', options)}`;
+    }
+
+    const dayNames = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(dayDate.getDate() + i);
+        const dayStr = dayDate.toISOString().split('T')[0];
+
+        const col = document.createElement('div');
+        col.className = `day-column ${dayStr === todayStr ? 'today' : ''}`;
+        
+        col.innerHTML = `
+            <div class="day-header">
+                <div class="day-name">${dayNames[i]}</div>
+                <div class="day-number">${dayDate.getDate()}</div>
+            </div>
+            <div class="day-events" id="events-${dayStr}"></div>
+        `;
+
+        grid.appendChild(col);
+
+        const eventsContainer = col.querySelector(`#events-${dayStr}`);
+        const dayEvents = userEventsCache.filter(e => e.date === dayStr);
+        dayEvents.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+        dayEvents.forEach(ev => {
+            const block = document.createElement('div');
+            block.className = `event-block ${ev.type === 'task' ? 'task' : ''}`;
+            block.innerHTML = `
+                <button class="delete-event-btn">✕</button>
+                <div class="event-time">${ev.type === 'task' ? '📌 TASK' : `${ev.startTime} - ${ev.endTime}`}</div>
+                <div class="event-title">${ev.title}</div>
+                ${ev.details ? `<div class="event-desc">${ev.details}</div>` : ''}
             `;
 
-            // Aggiunge la cancellazione dell'evento
-            card.querySelector('.delete-btn').addEventListener('click', async () => {
-                if (confirm(`Vuoi cancellare l'evento "${ev.title}"?`)) {
+            block.querySelector('.delete-event-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (confirm(`Eliminare "${ev.title}"?`)) {
                     await deleteDoc(doc(db, "users", uid, "events", ev.id));
                     await loadUserEvents(uid);
                 }
             });
 
-            container.appendChild(card);
+            eventsContainer.appendChild(block);
         });
-
-    } catch (e) {
-        console.error("Errore durante il caricamento degli eventi:", e);
     }
 }
 
-// Funzioni per la schermata Auth
+// Logica di risposta Intelligente dell'IA Coach
+function generateAIResponse(query) {
+    const q = query.toLowerCase();
+    const sport = userProfileCache.sport || "la tua disciplina";
+    const eventCount = userEventsCache.length;
+
+    if (q.includes('carico') || q.includes('analisi')) {
+        return `Basandomi sul tuo profilo (${sport}) e sui ${eventCount} eventi programmati nel calendario, il carico di lavoro settimanale è bilanciato. Ti consiglio di monitorare la frequenza cardiaca durante le sessioni più intense.`;
+    } else if (q.includes('gambe') || q.includes('dolore') || q.includes('recupero')) {
+        return `Per il recupero muscolare in ${sport}, ti suggerisco 15 minuti di stretching attivo, integrazione di elettroliti e un sonno di almeno 8 ore. Se il dolore persiste, inserisci una sessione di scarico nel calendario.`;
+    } else if (q.includes('nutrizione') || q.includes('mangiare')) {
+        return `Per ottimizzare le prestazioni in ${sport} con il tuo peso attuale (${userProfileCache.weight || '68'} kg), privilegia carboidrati complessi prima dell'allenamento e proteine ad alto valore biologico nel post-workout.`;
+    } else {
+        return `Ho analizzato la tua richiesta in merito a '${query}'. Per il tuo programma di ${sport}, i parametri attuali sono stabili. Continua a registrare ogni sessione nel calendario per ricevere feedback ancora più precisi!`;
+    }
+}
+
+// Auth Global Handlers
 window.switchAuthMode = function(mode) {
     const loginTab = document.getElementById('btn-login-tab');
     const regTab = document.getElementById('btn-register-tab');
@@ -289,14 +407,11 @@ window.switchAuthMode = function(mode) {
 window.handleLogin = async function() {
     const email = document.getElementById('login-email')?.value;
     const pass = document.getElementById('login-password')?.value;
-    if (!email || !pass) {
-        alert("Inserisci email e password.");
-        return;
-    }
+    if (!email || !pass) return alert("Inserisci email e password.");
     try {
         await signInWithEmailAndPassword(auth, email, pass);
     } catch (error) {
-        alert("Errore durante l'accesso: " + error.message);
+        alert("Errore accesso: " + error.message);
     }
 };
 
@@ -307,21 +422,15 @@ window.handleRegister = async function() {
     const weight = document.getElementById('reg-weight')?.value;
     const height = document.getElementById('reg-height')?.value;
 
-    if (!email || !pass) {
-        alert("Inserisci email e password per registrarti.");
-        return;
-    }
+    if (!email || !pass) return alert("Inserisci email e password.");
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users", userCredential.user.uid), {
             email, sport, weight, height, createdAt: new Date()
         });
-        
         alert("Account creato con successo!");
     } catch (error) {
-        alert("Errore durante la registrazione: " + error.message);
+        alert("Errore registrazione: " + error.message);
     }
 };

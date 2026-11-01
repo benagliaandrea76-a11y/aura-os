@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <!-- AUTH SCREEN -->
+    <!-- AUTH SCREEN (LOGIN / REGISTRAZIONE) -->
     <div id="auth-screen" class="auth-overlay">
         <div class="glass-card auth-card">
             <div class="logo-area" style="justify-content: center; margin-bottom: 25px;">
@@ -78,7 +78,7 @@
     <!-- MAIN APP CONTAINER -->
     <div id="main-app" class="app-container" style="display: none;">
         
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop) -->
         <aside class="desktop-sidebar">
             <div class="logo-area">
                 <div class="logo-icon">A</div>
@@ -90,7 +90,7 @@
             <ul class="nav-links">
                 <li class="nav-item active" data-tab="0">🏠 Home & Readiness</li>
                 <li class="nav-item" data-tab="1">🤖 AI Coach Lab</li>
-                <li class="nav-item" data-tab="2">📅 Calendario Eventi</li>
+                <li class="nav-item" data-tab="2">📅 Calendario</li>
                 <li class="nav-item" data-tab="3">📷 Vision Hub</li>
                 <li class="nav-item" data-tab="4">⚙️ Impostazioni</li>
             </ul>
@@ -113,8 +113,8 @@
             <div class="tab-content active" id="tab-0">
                 <header class="header-top">
                     <div class="welcome-msg">
-                        <h2>Bentornato, <span id="user-display-name">Atleta</span></h2>
-                        <p>I tuoi dati di allenamento inseriti e sincronizzati.</p>
+                        <h2>Bentornato, Atleta</h2>
+                        <p>Panoramica dello stato di forma e recupero odierno.</p>
                     </div>
                     <div class="user-badge">
                         <div class="status-dot"></div>
@@ -126,12 +126,12 @@
                     <div class="glass-card">
                         <div class="card-title">Readiness Score ⚡</div>
                         <div class="card-value" id="home-readiness">-- %</div>
-                        <div class="card-desc">Carica uno screenshot o registra un allenamento.</div>
+                        <div class="card-desc">Salsa neurale basata sugli allenamenti.</div>
                     </div>
                     <div class="glass-card">
                         <div class="card-title">Battito a Riposo 🫀</div>
                         <div class="card-value" id="home-hr">-- BPM</div>
-                        <div class="card-desc">Dato estratto da Vision Hub / Manuale.</div>
+                        <div class="card-desc">Aggiornato da Vision Hub / Manuale.</div>
                     </div>
                     <div class="glass-card">
                         <div class="card-title">Ultima Attività 🔋</div>
@@ -141,7 +141,7 @@
                     <div class="glass-card col-span-2">
                         <div class="card-title">Consiglio dell'AI Coach</div>
                         <p class="ai-recommendation-text" id="home-ai-text">
-                            "Inizia ad aggiungere i tuoi impegni nel Calendario o seleziona uno screenshot da Vision Hub per ricevere i primi consigli di recupero."
+                            "Inizia ad aggiungere i tuoi impegni nel Calendario o carica uno screenshot in Vision Hub per ricevere analisi fisiologiche dettagliate."
                         </p>
                     </div>
                 </div>
@@ -152,87 +152,66 @@
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>AURA AI Head Coach</h2>
-                        <p>Chiedi consigli basati sul tuo calendario e sui tuoi dati reali.</p>
+                        <p>Assistente intelligente basato sul tuo profilo e sui tuoi allenamenti reali.</p>
                     </div>
                 </header>
                 <div class="chat-container glass-card">
                     <div class="chat-messages" id="chat-box">
-                        <div class="message ai">Ciao! Sono pronto ad analizzare i tuoi dati e i tuoi allenamenti nel calendario. Come posso aiutarti oggi?</div>
+                        <div class="message ai">Ciao! Sono il tuo assistente di fisiologia e allenamento. Leggerò i tuoi dati e il tuo calendario per aiutarti a ottimizzare la performance. Come posso aiutarti oggi?</div>
                     </div>
 
                     <div class="ai-suggestions">
-                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Come posso organizzare l allenamento di oggi?')">⚡ Organizza la mia giornata</button>
-                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Consigli per recuperare gambe?')">🔋 Recupero muscolare</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Analizza il mio carico di allenamento.')">⚡ Analizza carico</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Ho i muscoli affaticati, cosa faccio?')">🔋 Recupero gambe</button>
+                        <button type="button" class="suggestion-chip" onclick="sendSuggestion('Consigli nutrizionali per oggi.')">🥗 Nutrizione</button>
                     </div>
 
                     <div class="chat-input-area">
-                        <input type="text" id="user-input" placeholder="Scrivi una domanda...">
+                        <input type="text" id="user-input" placeholder="Scrivi una domanda all'IA...">
                         <button type="button" class="btn-neon" id="send-btn">Invia</button>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: CALENDARIO STANDARD (GESTIBILE DA TE) -->
+            <!-- TAB 3: CALENDARIO -->
             <div class="tab-content" id="tab-2">
-                <header class="header-top">
+                <header class="header-top" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="welcome-msg">
                         <h2>Calendario & Programmazione</h2>
-                        <p>Inserisci i tuoi impegni, gli orari e le schede di allenamento.</p>
+                        <p id="calendar-week-range">Settimana Corrente</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" class="btn-neon-icon" id="prev-week-btn">◀</button>
+                        <button type="button" class="btn-neon-icon" id="today-week-btn">Oggi</button>
+                        <button type="button" class="btn-neon-icon" id="next-week-btn">▶</button>
+                        <button type="button" class="btn-add-main" id="open-add-modal-btn" title="Aggiungi Evento">+</button>
                     </div>
                 </header>
 
-                <div class="glass-card" style="margin-bottom: 20px;">
-                    <h3 class="section-heading">Aggiungi Nuovo Evento / Allenamento</h3>
-                    <div class="form-row" style="margin-top: 15px;">
-                        <div class="form-group">
-                            <label>Data</label>
-                            <input type="date" id="event-date" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Ora Inizio</label>
-                            <input type="time" id="event-start-time" class="form-control" value="15:00">
-                        </div>
-                        <div class="form-group">
-                            <label>Ora Fine</label>
-                            <input type="time" id="event-end-time" class="form-control" value="16:30">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Titolo Attività (es. Palestra Pettorali e Braccia, Bici XCO, Corsa)</label>
-                        <input type="text" id="event-title" class="form-control" placeholder="Scrivi qui il nome dell'attività">
-                    </div>
-                    <div class="form-group">
-                        <label>Scheda / Note / Esercizi Specifici (Opzionale)</label>
-                        <textarea id="event-details" class="form-control" rows="3" placeholder="Es. Panca piana 4x8, Curl bilanciere 3x10, Stretching 15 min..."></textarea>
-                    </div>
-                    <button type="button" class="btn-neon" id="add-event-btn" style="width: 100%;">Salva Evento nel Calendario</button>
-                </div>
-
-                <div class="glass-card">
-                    <h3 class="section-heading">I Tuoi Allenamenti & Eventi Programmati</h3>
-                    <div id="events-list-container" style="margin-top: 15px;">
-                        <p class="text-muted" id="no-events-msg">Nessun evento salvato. Compila il modulo sopra per iniziare la tua programmazione.</p>
+                <div class="glass-card" style="padding: 10px; overflow-x: auto;">
+                    <div class="calendar-weekly-grid" id="weekly-grid">
+                        <!-- Generato dinamicamente via JS (Lunedì - Domenica) -->
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 4: VISION HUB (ANALISI SCREENSHOT AI) -->
+            <!-- TAB 4: VISION HUB -->
             <div class="tab-content" id="tab-3">
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>Vision Hub (Garmin / Zepp / Apple Health)</h2>
-                        <p>Carica uno screenshot per inserire automaticamente i dati nel tuo calendario.</p>
+                        <p>Carica uno screenshot per l'estrazione automatica dei dati tramite IA.</p>
                     </div>
                 </header>
                 <div class="glass-card upload-zone" id="drop-zone">
                     <div class="upload-icon">📁</div>
-                    <h3>Carica uno screenshot dell'allenamento</h3>
-                    <p class="section-sub">L'AI leggerà la data, le ore, le calorie e la frequenza cardiaca aggiungendoli ai tuoi dati.</p>
+                    <h3>Carica lo screenshot dell'allenamento</h3>
+                    <p class="section-sub">L'IA elaborerà l'immagine estraendo FC, durata e calorie salvandole nel calendario.</p>
                     <input type="file" id="file-input" hidden accept="image/*">
                     <button type="button" class="btn-neon" onclick="document.getElementById('file-input').click()">Seleziona Foto</button>
                 </div>
                 <div id="ocr-status" style="margin-top: 15px; display: none;" class="glass-card">
-                    <p id="ocr-status-text">Analisi dello screenshot in corso...</p>
+                    <p id="ocr-status-text">Analisi IA in corso...</p>
                 </div>
             </div>
 
@@ -241,7 +220,7 @@
                 <header class="header-top">
                     <div class="welcome-msg">
                         <h2>Profilo & Impostazioni</h2>
-                        <p>I tuoi dati personali sincronizzati sul cloud.</p>
+                        <p>Configurazione dei tuoi parametri personali sul cloud.</p>
                     </div>
                 </header>
                 <div class="glass-card profile-card">
@@ -276,7 +255,7 @@
             </div>
         </main>
 
-        <!-- Bottom Navigation Mobile -->
+        <!-- Bottom Navigation (Mobile) -->
         <nav class="mobile-bottom-nav">
             <div class="mobile-nav-item active" data-tab="0">
                 <div class="icon">🏠</div>
@@ -300,6 +279,59 @@
             </div>
         </nav>
 
+    </div>
+
+    <!-- MODALE AGGIUNGI EVENTO "+" -->
+    <div id="event-modal" class="auth-overlay" style="display: none; z-index: 9999;">
+        <div class="glass-card auth-card" style="max-width: 500px; width: 90%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #fff;">Nuova Attività / Evento</h3>
+                <button type="button" id="close-modal-btn" style="background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="modal-event-type" class="form-control">
+                    <option value="calendar">Allenamento in Calendario</option>
+                    <option value="task">Promemoria / Task</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Titolo (es. Palestra Pettorali, Bici XCO)</label>
+                <input type="text" id="modal-event-title" class="form-control" placeholder="Nome dell'attività...">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="modal-event-date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Inizio</label>
+                    <input type="time" id="modal-event-start" class="form-control" value="15:00">
+                </div>
+                <div class="form-group">
+                    <label>Fine</label>
+                    <input type="time" id="modal-event-end" class="form-control" value="16:30">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Ripetizione</label>
+                <select id="modal-event-repeat" class="form-control">
+                    <option value="none">Nessuna (Singolo giorno)</option>
+                    <option value="weekly">Ogni settimana</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Scheda / Esercizi Specifici / Note</label>
+                <textarea id="modal-event-details" class="form-control" rows="3" placeholder="Es. Panca piana 4x8, Curl 3x10..."></textarea>
+            </div>
+
+            <button type="button" class="btn-neon" id="save-modal-event-btn" style="width: 100%; margin-top: 10px;">Salva nel Calendario</button>
+        </div>
     </div>
 
     <script type="module" src="app.js"></script>
